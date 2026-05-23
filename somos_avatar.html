@@ -140,6 +140,15 @@ body{font-family:var(--f);background:var(--blk);color:var(--wh);min-height:100vh
 .mbox h3{color:var(--or);margin-bottom:1rem;font-size:1rem}
 .mbox p{color:var(--gr);font-size:.72rem;margin-top:.7rem;word-break:break-all}
 .mclose{margin-top:1rem;padding:.55rem 1.3rem;background:var(--or);color:var(--wh);border:none;border-radius:6px;font-family:var(--f);cursor:pointer;font-weight:700}
+
+/* SCORE BADGE — siempre visible en jugadores */
+#score-badge{position:fixed;bottom:0;left:0;right:0;background:#0A0A0A;border-top:2px solid var(--or);
+  padding:.5rem 1.2rem;display:none;justify-content:space-between;align-items:center;z-index:50}
+#badge-name{font-size:.8rem;color:var(--gr);font-weight:600}
+#badge-pts{font-size:1.1rem;font-weight:900;color:var(--or)}
+/* online/answered counters */
+.mc-live{font-size:.75rem;color:var(--or);font-weight:700;background:rgba(242,101,34,.15);
+  padding:.3rem .7rem;border-radius:20px;border:1px solid var(--or)}
 </style>
 </head>
 <body>
@@ -161,7 +170,7 @@ body{font-family:var(--f);background:var(--blk);color:var(--wh);min-height:100vh
 <!-- MC BOARD -->
 <div id="vB" class="view">
   <div class="tb">
-    <div class="tb-t">🎮 TABLERO — MODERADOR</div>
+    <div class="tb-t">🎮 TABLERO — MODERADOR</div><span class="mc-live" id="online-count">👥 0 en línea</span>
     <div class="tb-r">
       <button class="tbtn" onclick="showQR()">QR Jugadores</button>
       <button class="tbtn" onclick="showScoreboard()">🏆 Marcador</button>
@@ -206,7 +215,7 @@ body{font-family:var(--f);background:var(--blk);color:var(--wh);min-height:100vh
       <span class="qptslbl" id="q-pts-lbl"></span>
     </div>
     <div class="qtxt" id="q-text"></div>
-    <div class="qopts-label" id="q-opts-label">▼ Opciones solo visibles para el MC</div>
+    <div style="display:flex;justify-content:space-between;align-items:center"><div class="qopts-label" id="q-opts-label">▼ Opciones solo visibles para el MC</div><span class="mc-live" id="answered-count" style="display:none">0 respondieron</span></div>
     <div class="qopts" id="q-opts"></div>
     <div class="twrap" id="t-wrap" style="display:none"><div class="tbar" id="t-bar" style="width:100%"></div></div>
     <div class="tdisp" id="t-disp" style="display:none">20</div>
@@ -294,6 +303,15 @@ body{font-family:var(--f);background:var(--blk);color:var(--wh);min-height:100vh
   <div class="pptslbl">puntos totales</div>
 </div>
 
+<!-- SCORE BADGE -->
+<div id="score-badge">
+  <div id="badge-name"></div>
+  <div>
+    <span style="font-size:.7rem;color:var(--gr);margin-right:.4rem">MIS PUNTOS</span>
+    <span id="badge-pts">0</span>
+  </div>
+</div>
+
 <!-- QR MODAL -->
 <div id="modal-qr" class="modal h">
   <div class="mbox">
@@ -355,7 +373,7 @@ const CATEGORIES = [
       opts:["Para comunicarse a distancia","Para saber si otra abeja ya visitó esa flor","Para orientarse con el campo magnético","Para regular su temperatura"], ans:1,
       expl:"Cuando una abeja visita una flor, deja parte de su carga electrostática en ella. Las siguientes abejas 'leen' esa carga y saben si la flor ya fue explotada recientemente. Información en tiempo real, sin palabras, sin vista.",
       ref:"Clarke, D. et al. — Bees detect floral electric fields (2013) Science" },
-    { pts:200, skill:"🔢 OPERACIÓN", challenge:"El camarón mantis tiene 16 fotorreceptores. Los humanos tenemos 3. ¿Cuántos más tiene el camarón? (R=13)",
+    { pts:200, skill:"🔢 OPERACIÓN", challenge:"El camarón mantis tiene 16 fotorreceptores. Los humanos tenemos 3. ¿Cuántos más tiene el camarón?",
       q:"Una conversación normal mide 60 dB. Un concierto de rock, 110 dB. ¿Cuántas veces más intensa es la energía sonora?",
       opts:["50 veces","500 veces","5,000 veces","100,000 veces"], ans:3,
       expl:"Los decibeles son logarítmicos: cada 10 dB = ×10 en energía. 50 dB de diferencia = 10⁵ = 100,000 veces más intenso. Tu oído comprime rangos astronómicos de energía en algo que puedes tolerar.",
@@ -382,7 +400,7 @@ const CATEGORIES = [
       opts:["Hacen la experiencia más intuitiva","Replican exactamente el mecanismo de las máquinas tragamonedas","Maximizan la carga de contenido relevante","Los algoritmos priorizan el contenido más valioso"], ans:1,
       expl:'Aza Raskin, inventor del scroll infinito, lo llamó "un error que costó a la humanidad 200,000 horas de atención al día". La imprevisibilidad de la recompensa es el mecanismo de condicionamiento más poderoso conocido. Igual que la tragamonedas.',
       ref:"Raskin, A. — Center for Humane Technology (2018)" },
-    { pts:200, skill:"🔢 OPERACIÓN", challenge:"4h al teléfono × 80% sobre ti + 2h en juntas × 35% del tiempo. ¿Cuántas horas hablas de ti? (R≈4h)",
+    { pts:200, skill:"🔢 OPERACIÓN", challenge:"4h al teléfono × 80% sobre ti + 2h en juntas × 35% del tiempo. ¿Cuántas horas hablas de ti?",
       q:"¿Cuál es estadísticamente el mayor miedo del ser humano?",
       opts:["Morir","Las alturas","Hablar en público","Quedarse solo"], ans:2,
       expl:"Evolutivamente, la exclusión del grupo equivalía a la muerte. El juicio social activa exactamente el mismo circuito de amenaza que el peligro físico. Tu cerebro no distingue entre los dos. Por eso 'me muero de pena' es casi literal.",
@@ -409,7 +427,7 @@ const CATEGORIES = [
       opts:["IA: 85 | Sin IA: 60","IA: 78 | Sin IA: 64","IA: 92 | Sin IA: 74","IA: 95 | Sin IA: 80"], ans:2,
       expl:"GPT-4 solo obtuvo 92 puntos vs. 74 de médicos sin IA. Pero lo más revelador fue lo que pasó cuando los médicos usaron la IA junto a su propio criterio. El resultado sorprendió a todos.",
       ref:"Goh, E. et al. — Evaluating LLM Diagnostic Accuracy (2024) JAMA Network Open" },
-    { pts:200, skill:"🔢 OPERACIÓN", challenge:"GPT-4 obtuvo 92 puntos. Médicos sin IA: 74. ¿Cuántos puntos de diferencia? (R=18)",
+    { pts:200, skill:"🔢 OPERACIÓN", challenge:"GPT-4 obtuvo 92 puntos. Médicos sin IA: 74. ¿Cuántos puntos de diferencia?",
       q:"Los médicos sin IA obtuvieron 74 puntos. Al darles acceso a GPT-4, ¿cuánto mejoraron?",
       opts:["18 puntos más (92 total)","10 puntos más (84 total)","5 puntos más (79 total)","Solo 2 puntos más (76 total)"], ans:3,
       expl:"La IA sola obtuvo 92. Médicos + IA apenas 76. Solo 2 puntos de mejora. El problema no fue la herramienta —fue que los médicos continuaron su proceso habitual y consultaron la IA al final, como confirmación. No como colaboración.",
@@ -436,7 +454,7 @@ const CATEGORIES = [
       opts:["Lo reproduce como una grabación exacta","Lo reconstruye y altera con tu estado emocional actual","Lo comprime en fragmentos clave","Lo almacena idéntico pero tarda más en recuperarlo"], ans:1,
       expl:"Recordar es reescribir, no leer. Cada vez que accedes a un recuerdo lo modificas con tu estado emocional presente. No existe el recuerdo original —existe la última versión que construiste. Los testimonios oculares son el ejemplo más dramático de esto.",
       ref:"Loftus, E. — The Malleability of Human Memory (1979) American Scientist" },
-    { pts:200, skill:"🔢 OPERACIÓN", challenge:"Si tardas 80 ms en procesar la realidad y un segundo tiene 1,000 ms, ¿cuántas veces por segundo estás viendo el pasado? (R≈12)",
+    { pts:200, skill:"🔢 OPERACIÓN", challenge:"Si tardas 80 ms en procesar la realidad y un segundo tiene 1,000 ms, ¿cuántas veces por segundo estás viendo el pasado?",
       q:"¿Qué tipo de anestesia se usa cuando un neurocirujano opera el cerebro de un paciente despierto?",
       opts:["Anestesia general —el paciente duerme","Solo anestesia local en el cuero cabelludo —el cerebro no tiene receptores de dolor","Sedación profunda con conciencia parcial","Ninguna —la mente supera al cuerpo"], ans:1,
       expl:"El cerebro es el único órgano del cuerpo que no puede sentir que le duele. Tiene cero receptores de dolor. Por eso los neurocirujanos operan a pacientes completamente despiertos que platican con el médico durante la cirugía. El cerebro no sabe que lo están abriendo.",
@@ -470,6 +488,7 @@ let S = {
   pChoice: null, pLockedPts: null,
   scores: {}
 };
+let answersRef = null;
 
 // ═══════════════════════════════════════════════
 //  FIREBASE INIT
@@ -478,16 +497,29 @@ let db;
 try {
   firebase.initializeApp(firebaseConfig);
   db = firebase.database();
+
+  // Game state listener
   db.ref('game').on('value', snap => {
     const ev = snap.val();
     if (!ev) return;
     if (S.role === 'player') handlePlayerEvent(ev);
   });
+
+  // Scores listener
   db.ref('scores').on('value', snap => {
     S.scores = snap.val() || {};
     if (S.role === 'scores' || S.role === 'mc') refreshScoreDisplay();
     if (S.role === 'player') refreshPlayerPts();
   });
+
+  // Presence listener (online count for MC)
+  db.ref('presence').on('value', snap => {
+    const data = snap.val() || {};
+    const count = Object.values(data).filter(v => v && v.role === 'player').length;
+    const el = document.getElementById('online-count');
+    if (el) el.textContent = '👥 ' + count + ' en línea';
+  });
+
 } catch(e) { console.warn('Firebase no configurado:', e.message); }
 
 function fbBroadcast(data) {
@@ -508,6 +540,21 @@ function fbGetResponses(catIdx, qIdx, cb) {
   if (!db) { cb({}); return; }
   db.ref(`responses/${catIdx}_${qIdx}`).once('value', snap => cb(snap.val()||{}));
 }
+function startAnswersListener(ci, qi) {
+  if (answersRef) { answersRef.off(); answersRef = null; }
+  if (!db) return;
+  answersRef = db.ref(`responses/${ci}_${qi}`);
+  answersRef.on('value', snap => {
+    const count = Object.keys(snap.val()||{}).length;
+    const el = document.getElementById('answered-count');
+    if (el) { el.textContent = count + ' respondieron'; el.style.display = ''; }
+  });
+}
+function stopAnswersListener() {
+  if (answersRef) { answersRef.off(); answersRef = null; }
+  const el = document.getElementById('answered-count');
+  if (el) el.style.display = 'none';
+}
 
 // ═══════════════════════════════════════════════
 //  ROUTING & VIEWS
@@ -517,7 +564,6 @@ function showView(id) {
   document.getElementById(id).classList.add('active');
 }
 
-// URL-based routing
 const urlP = new URLSearchParams(location.search);
 window.addEventListener('load', () => {
   if (urlP.get('view') === 'scores') { S.role='scores'; S.name='Marcador'; showView('vSC'); refreshScoreDisplay(); return; }
@@ -540,25 +586,54 @@ function doLogin() {
   if (!S.role) { document.getElementById('lerr').textContent='Elige un rol'; return; }
   if (S.role === 'player' && !n) { document.getElementById('lerr').textContent='Escribe tu nombre'; return; }
   S.name = n || 'MC';
-  if (S.role === 'mc') { buildBoard(); showView('vB'); }
-  else if (S.role === 'player') { showView('vPW'); initPlayerWait(); fbBroadcast({type:'idle'}); }
-  else if (S.role === 'scores') { showView('vSC'); refreshScoreDisplay(); }
+  if (S.role === 'mc') {
+    buildBoard();
+    showView('vB');
+  } else if (S.role === 'player') {
+    // Register presence
+    if (db) {
+      const key = S.name.replace(/[.#$\/\[\]]/g,'_');
+      const presRef = db.ref('presence/' + key);
+      presRef.set({name: S.name, role: 'player', ts: Date.now()});
+      db.ref('.info/connected').on('value', snap => {
+        if (snap.val()) presRef.onDisconnect().remove();
+      });
+    }
+    // Show score badge
+    const badge = document.getElementById('score-badge');
+    badge.style.display = 'flex';
+    document.getElementById('badge-name').textContent = S.name;
+    document.getElementById('badge-pts').textContent = S.scores[S.name.replace(/[.#$\/\[\]]/g,'_')] || 0;
+    // Go to wait — read current game state from Firebase (don't broadcast idle)
+    showView('vPW');
+    document.getElementById('pw-name').textContent = S.name;
+    refreshPlayerPts();
+    // Read current game state and apply
+    if (db) {
+      db.ref('game').once('value', snap => {
+        const ev = snap.val();
+        if (ev && ev.type && ev.type !== 'idle') handlePlayerEvent(ev);
+      });
+    }
+  } else if (S.role === 'scores') {
+    showView('vSC');
+    refreshScoreDisplay();
+  }
 }
 
 // ═══════════════════════════════════════════════
 //  BUILD BOARD (5×5 GRID)
 // ═══════════════════════════════════════════════
 function buildBoard() {
+  stopAnswersListener();
   const g = document.getElementById('board-grid');
   g.innerHTML = '';
-  // Category headers
   CATEGORIES.forEach(c => {
     const h = document.createElement('div');
     h.className = 'cath';
     h.textContent = c.name;
     g.appendChild(h);
   });
-  // Question rows (row 0=100pts ... row 4=500pts)
   for (let qi = 0; qi < 5; qi++) {
     CATEGORIES.forEach((cat, ci) => {
       const q = cat.questions[qi];
@@ -592,10 +667,8 @@ function openChallenge(ci, qi) {
 function challengeDone() {
   const ci = S.cat, qi = S.q;
   const q = CATEGORIES[ci].questions[qi];
-  // Reset question view state
   S.optsVisible = false; S.timerRunning = false; S.revealed = false;
   clearInterval(S.timerIv);
-  // Populate question view
   document.getElementById('q-cat-lbl').textContent = CATEGORIES[ci].name;
   document.getElementById('q-pts-lbl').textContent = q.pts + ' pts';
   document.getElementById('q-text').textContent = q.q;
@@ -611,7 +684,6 @@ function challengeDone() {
   document.getElementById('btn-reveal').style.display = 'none';
   document.getElementById('btn-board2').style.display = 'none';
   document.getElementById('btn-stats').style.display = 'none';
-  // Broadcast question (no options)
   fbBroadcast({type:'question', catIdx:ci, qIdx:qi});
   showView('vQ');
 }
@@ -622,10 +694,7 @@ function renderOpts(ci, qi, revealed, correctIdx) {
   const letters = ['A','B','C','D'];
   q.opts.forEach((opt, i) => {
     const div = document.createElement('div');
-    div.className = 'qopt';
-    if (revealed) {
-      div.className += i === correctIdx ? ' cor' : ' wrg';
-    }
+    div.className = 'qopt' + (revealed ? (i === correctIdx ? ' cor' : ' wrg') : '');
     div.innerHTML = `<div class="qltr">${letters[i]}</div><span>${opt}</span>`;
     wrap.appendChild(div);
   });
@@ -646,21 +715,27 @@ function startTimer() {
   document.getElementById('t-disp').style.display = '';
   document.getElementById('btn-timer').style.display = 'none';
   document.getElementById('btn-stats').style.display = '';
+  startAnswersListener(ci, qi);
   fbBroadcast({type:'timer_start', catIdx:ci, qIdx:qi, timeLimit:S.timerMax, maxPts:q.pts, minPts});
   const bar = document.getElementById('t-bar');
   const disp = document.getElementById('t-disp');
   S.timerIv = setInterval(() => {
     S.timerMs -= 100;
-    if (S.timerMs <= 0) { S.timerMs = 0; clearInterval(S.timerIv); document.getElementById('btn-reveal').style.display=''; }
+    if (S.timerMs <= 0) {
+      S.timerMs = 0;
+      clearInterval(S.timerIv);
+      document.getElementById('btn-reveal').style.display = '';
+    }
     bar.style.width = (S.timerMs / S.timerMax * 100) + '%';
-    disp.textContent = Math.ceil(S.timerMs/1000);
-    bar.style.background = S.timerMs > S.timerMax*0.4 ? 'var(--or)' : 'var(--err)';
+    disp.textContent = Math.ceil(S.timerMs / 1000);
+    bar.style.background = S.timerMs > S.timerMax * 0.4 ? 'var(--or)' : 'var(--err)';
   }, 100);
-  setTimeout(() => { if (!S.revealed) document.getElementById('btn-reveal').style.display=''; }, S.timerMax);
+  setTimeout(() => { if (!S.revealed) document.getElementById('btn-reveal').style.display = ''; }, S.timerMax + 200);
 }
 function doReveal() {
   S.revealed = true;
   clearInterval(S.timerIv);
+  stopAnswersListener();
   const ci = S.cat, qi = S.q;
   const q = CATEGORIES[ci].questions[qi];
   renderOpts(ci, qi, true, q.ans);
@@ -673,12 +748,12 @@ function doReveal() {
   document.getElementById('btn-reveal').style.display = 'none';
   document.getElementById('btn-board2').style.display = '';
   document.getElementById('t-bar').style.background = 'var(--ok)';
-  // Mark used
   S.used[ci+'_'+qi] = true;
   fbBroadcast({type:'reveal', ans:q.ans, expl:q.expl, correctText:q.opts[q.ans]});
 }
 function backToBoard() {
   clearInterval(S.timerIv);
+  stopAnswersListener();
   fbBroadcast({type:'idle'});
   buildBoard();
   showView('vB');
@@ -687,9 +762,8 @@ function showStats() {
   const ci = S.cat, qi = S.q;
   const q = CATEGORIES[ci].questions[qi];
   fbGetResponses(ci, qi, data => {
-    const counts = [0,0,0,0];
-    let total = 0;
-    Object.values(data).forEach(r => { if(r.chosen >= 0 && r.chosen <= 3) { counts[r.chosen]++; total++; } });
+    const counts = [0,0,0,0]; let total = 0;
+    Object.values(data).forEach(r => { if(r.chosen >= 0 && r.chosen <= 3){ counts[r.chosen]++; total++; } });
     const letters = ['A','B','C','D'];
     const body = document.getElementById('stats-body');
     body.innerHTML = `<div style="font-size:.8rem;color:var(--gr);margin-bottom:.5rem">Total respuestas: ${total}</div>`;
@@ -718,8 +792,7 @@ function refreshScoreDisplay() {
   const medals = ['🥇','🥈','🥉'];
   list.innerHTML = sorted.length === 0
     ? '<div style="text-align:center;color:var(--gr);padding:2rem">Sin puntajes aún</div>'
-    : sorted.map(([n,p], i) => `
-      <div class="scrow">
+    : sorted.map(([n,p], i) => `<div class="scrow">
         <div class="scrk ${i<3?'scrk-'+(i+1):''}">${medals[i]||'#'+(i+1)}</div>
         <div class="scnm">${n.replace(/_/g,' ')}</div>
         <div class="scpt">${p}</div>
@@ -728,7 +801,7 @@ function refreshScoreDisplay() {
 function showScoreboard() { refreshScoreDisplay(); showView('vSC'); }
 function resetGame() {
   if (!confirm('¿Reiniciar todos los puntajes?')) return;
-  if (db) { db.ref('scores').set(null); db.ref('responses').set(null); db.ref('game').set({type:'idle'}); }
+  if (db) { db.ref('scores').set(null); db.ref('responses').set(null); db.ref('presence').set(null); db.ref('game').set({type:'idle'}); }
   S.used = {};
   buildBoard();
 }
@@ -736,14 +809,12 @@ function resetGame() {
 // ═══════════════════════════════════════════════
 //  PLAYER LOGIC
 // ═══════════════════════════════════════════════
-function initPlayerWait() {
-  document.getElementById('pw-name').textContent = S.name;
-  document.getElementById('pw-pts').textContent = (S.scores[S.name.replace(/[.#$\/\[\]]/g,'_')]||0);
-}
 function refreshPlayerPts() {
   const key = S.name.replace(/[.#$\/\[\]]/g,'_');
   const pts = S.scores[key] || 0;
   ['pw-pts','pr-total'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=pts; });
+  const badge = document.getElementById('badge-pts');
+  if (badge) badge.textContent = pts;
 }
 function handlePlayerEvent(ev) {
   if (!ev) return;
@@ -755,24 +826,25 @@ function handlePlayerEvent(ev) {
       break;
     case 'challenge':
       S.cat = ev.catIdx; S.q = ev.qIdx;
-      const cat = CATEGORIES[ev.catIdx];
-      const qc = cat.questions[ev.qIdx];
       document.getElementById('pc-name').textContent = S.name;
-      document.getElementById('pc-skill').textContent = qc.skill + ' — ' + qc.pts + ' puntos';
+      document.getElementById('pc-skill').textContent =
+        CATEGORIES[ev.catIdx].questions[ev.qIdx].skill + ' — ' +
+        CATEGORIES[ev.catIdx].questions[ev.qIdx].pts + ' puntos';
       showView('vPC');
       break;
     case 'question':
       S.cat = ev.catIdx; S.q = ev.qIdx;
       S.pChoice = null; S.pLockedPts = null;
-      const qqq = CATEGORIES[ev.catIdx].questions[ev.qIdx];
       document.getElementById('pq-name').textContent = S.name;
-      document.getElementById('pq-text').textContent = qqq.q;
+      document.getElementById('pq-text').textContent = CATEGORIES[ev.catIdx].questions[ev.qIdx].q;
       showView('vPQ');
       break;
     case 'timer_start':
       S.cat = ev.catIdx; S.q = ev.qIdx;
-      S.timerMax = ev.timeLimit || 20000; S.timerMs = S.timerMax;
-      S.pChoice = null; S.pLockedPts = null;
+      S.timerMax = ev.timeLimit || 20000;
+      S.timerMs = S.timerMax;
+      S.pChoice = null;
+      S.pLockedPts = null;
       clearInterval(S.timerIv);
       renderPlayerAnswer(ev.maxPts, ev.minPts);
       showView('vPA');
@@ -801,38 +873,51 @@ function renderPlayerAnswer(maxPts, minPts) {
     btn.onclick = () => {
       if (S.pChoice !== null) return;
       S.pChoice = i;
-      S.pLockedPts = parseInt(document.getElementById('pa-pts').textContent)||0;
+      // Capture displayed pts at moment of click
+      S.pLockedPts = parseInt(document.getElementById('pa-pts').textContent) || 0;
       fbSaveResponse(S.cat, S.q, S.name, i, S.pLockedPts);
-      wrap.querySelectorAll('.popt').forEach((b,j) => { b.classList.add('locked'); if(j===i) b.classList.add('sel'); });
+      wrap.querySelectorAll('.popt').forEach((b,j) => {
+        b.classList.add('locked');
+        if (j === i) b.classList.add('sel');
+      });
       document.getElementById('pa-locked').style.display = '';
     };
     wrap.appendChild(btn);
   });
 }
 function startPlayerTimer(maxPts, minPts) {
-  const range = (maxPts||100) - (minPts||20);
+  const max = maxPts || 100;
+  const min = minPts || 20;
+  const range = max - min;
   S.timerIv = setInterval(() => {
-    S.timerMs -= 100;
-    if (S.timerMs < 0) S.timerMs = 0;
+    S.timerMs = Math.max(0, S.timerMs - 100);
     const pct = S.timerMs / S.timerMax;
-    const currentPts = Math.round((minPts||20) + range * pct);
+    const currentPts = Math.round(min + range * pct);
     if (S.pChoice === null) document.getElementById('pa-pts').textContent = currentPts;
-    document.getElementById('pa-timer').textContent = Math.ceil(S.timerMs/1000);
+    document.getElementById('pa-timer').textContent = Math.ceil(S.timerMs / 1000);
     document.getElementById('pa-timer').style.color = pct > 0.4 ? 'var(--or)' : 'var(--err)';
     if (S.timerMs <= 0) clearInterval(S.timerIv);
   }, 100);
 }
 function renderPlayerReveal(correctIdx, expl, correctText) {
-  const correct = S.pChoice === correctIdx;
-  const ptsEarned = correct ? (S.pLockedPts||0) : 0;
+  // correctIdx and S.pChoice are both 0-based integers
+  const correct = (S.pChoice !== null) && (S.pChoice === correctIdx);
+  const ptsEarned = correct ? (S.pLockedPts || 0) : 0;
+  // Save to Firebase
   if (correct && ptsEarned > 0) fbSaveScore(S.name, ptsEarned);
+  // Optimistic total (Firebase listener will confirm)
+  const key = S.name.replace(/[.#$\/\[\]]/g,'_');
+  const prevTotal = S.scores[key] || 0;
+  const newTotal = prevTotal + ptsEarned;
   document.getElementById('pr-name').textContent = S.name;
   document.getElementById('pr-pts').textContent = correct ? '+' + ptsEarned + ' pts ✅' : '+0 pts ✗';
   document.getElementById('pr-pts').style.color = correct ? 'var(--ok)' : 'var(--err)';
   document.getElementById('pr-result').textContent = correct ? '¡Correcto!' : 'Incorrecto';
-  document.getElementById('pr-correct-ans').textContent = '✅ ' + correctText;
+  document.getElementById('pr-correct-ans').textContent = '✅ ' + (correctText||'');
   document.getElementById('pr-expl').textContent = expl || '';
-  document.getElementById('pr-total').textContent = S.scores[S.name.replace(/[.#$\/\[\]]/g,'_')] || 0;
+  document.getElementById('pr-total').textContent = newTotal;
+  const badge = document.getElementById('badge-pts');
+  if (badge) badge.textContent = newTotal;
 }
 
 // ═══════════════════════════════════════════════
@@ -845,7 +930,6 @@ function showQR() {
   document.getElementById('qr-url').textContent = url;
   const container = document.getElementById('qr-container');
   container.innerHTML = '';
-  if (qrObj) { qrObj = null; }
   qrObj = new QRCode(container, { text: url, width: 200, height: 200, colorDark:'#1A1A1A', colorLight:'#FFFFFF' });
   document.getElementById('modal-qr').classList.remove('h');
 }
