@@ -29,13 +29,18 @@ body{font-family:var(--f);background:var(--blk);color:var(--wh);min-height:100vh
 .lbtn:hover{background:var(--ord)}
 .lerr{color:var(--err);font-size:.85rem}
 
-/* TOPBAR */
+/* TOPBAR (vistas que NO son el tablero MC) */
 .tb{background:#0A0A0A;padding:.65rem 1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--or);flex-shrink:0}
 .tb-t{font-size:.9rem;font-weight:900;color:var(--or);letter-spacing:1px}
 .tb-r{display:flex;gap:.5rem;align-items:center}
 .tbtn{padding:.35rem .8rem;background:var(--card);border:1px solid #444;color:var(--wh);border-radius:5px;cursor:pointer;font-family:var(--f);font-size:.75rem;font-weight:600;transition:all .2s}
 .tbtn:hover{border-color:var(--or)}
 .tbtn.d{border-color:var(--err);color:var(--err)}
+
+/* MC BOARD HEADER — imagen + controles integrados */
+#mc-header{display:flex;flex-direction:column;flex-shrink:0;background:#0A0A0A}
+#mc-header-img{width:100%;display:block;object-fit:cover;object-position:center;max-height:90px}
+#mc-ctrl{display:flex;align-items:center;justify-content:space-between;padding:.45rem .8rem;border-bottom:2px solid var(--or);gap:.6rem;flex-wrap:wrap}
 
 /* BOARD */
 #vB{background:var(--blk)}
@@ -177,12 +182,15 @@ body{font-family:var(--f);background:var(--blk);color:var(--wh);min-height:100vh
 
 <!-- MC BOARD -->
 <div id="vB" class="view">
-  <div class="tb">
-    <div class="tb-t">🎮 TABLERO — MODERADOR</div><span class="mc-live" id="online-count">👥 0 en línea</span>
-    <div class="tb-r">
-      <button class="tbtn" onclick="showQR()">QR Jugadores</button>
-      <button class="tbtn" onclick="showScoreboard()">🏆 Marcador</button>
-      <button class="tbtn d" onclick="resetGame()">🔄 Reiniciar</button>
+  <div id="mc-header">
+    <img id="mc-header-img" src="https://i.ibb.co/FLtKm9XP/header.jpg" alt="¿Somos Avatar o Somos Código?">
+    <div id="mc-ctrl">
+      <span class="mc-live" id="online-count">👥 0 en línea</span>
+      <div class="tb-r">
+        <button class="tbtn" onclick="showQR()">📱 QR Jugadores</button>
+        <button class="tbtn" onclick="showScoreboard()">🏆 Marcador</button>
+        <button class="tbtn d" onclick="resetGame()">🔄 Reiniciar</button>
+      </div>
     </div>
   </div>
   <div id="players-panel"></div>
