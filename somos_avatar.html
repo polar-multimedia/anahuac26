@@ -172,6 +172,7 @@ body{font-family:var(--f);background:var(--blk);color:var(--wh);min-height:100vh
 
 <!-- LANDING -->
 <div id="vL" class="view active">
+  <img src="https://i.ibb.co/BHvcH460/logito.png" alt="Logo" style="max-width:220px;width:80%;object-fit:contain">
   <div class="ll">¿Somos Avatar o Somos Código?</div>
   <div class="ls">Módulo XI · Universidad Anáhuac del Norte</div>
   <input id="inp-name" class="linp" placeholder="Tu nombre o equipo" maxlength="30">
@@ -1025,6 +1026,8 @@ function doLogout() {
   document.getElementById('inp-name').value = '';
   document.querySelectorAll('.lrole').forEach(b => b.classList.remove('sel'));
   document.getElementById('lerr').textContent = '';
+  // Si estamos en modo QR, re-bloquear rol a jugador
+  if (urlP.get('module') !== null) lockAsPlayer();
   showView('vL');
 }
 
