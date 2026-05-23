@@ -281,6 +281,7 @@ body{font-family:var(--f);background:var(--blk);color:var(--wh);min-height:100vh
   <div class="ptxt">En un momento comenzará tu participación.</div>
   <div class="ppts" id="pw-pts">0</div>
   <div class="pptslbl">puntos acumulados</div>
+  <button onclick="doLogout()" style="margin-top:.8rem;padding:.5rem 1.2rem;background:transparent;border:1px solid #444;color:var(--gr);border-radius:6px;font-family:var(--f);font-size:.78rem;cursor:pointer">← No soy yo / Cambiar jugador</button>
 </div>
 
 <!-- PLAYER: CHALLENGE IN PROGRESS -->
@@ -614,6 +615,14 @@ window.addEventListener('load', () => {
   if (urlP.get('view') === 'scores') { S.role='scores'; S.name='Marcador'; showView('vSC'); refreshScoreDisplay(); return; }
   if (urlP.get('module') !== null) { showView('vL'); preselectRole('player'); return; }
   showView('vL');
+});
+// iOS Safari restaura páginas desde caché sin recargar el JS.
+// Si el jugador vuelve al tab y ya estaba logueado, lo mandamos al login.
+window.addEventListener('pageshow', ev => {
+  if (ev.persisted && S.role === 'player') {
+    doLogout();
+    if (urlP.get('module') !== null) preselectRole('player');
+  }
 });
 
 function preselectRole(r) {
@@ -1015,8 +1024,7 @@ function doLogout() {
 // ═══════════════════════════════════════════════
 let qrObj = null;
 function showQR() {
-  const base = location.href.split('?')[0];
-  const url = base + '?module=0';
+  const url = 'https://polar-multimedia.github.io/anahuac26/somos_avatar.html?module=0';
   document.getElementById('qr-url').textContent = url;
   const container = document.getElementById('qr-container');
   container.innerHTML = '';
