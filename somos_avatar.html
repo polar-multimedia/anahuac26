@@ -117,7 +117,11 @@ body{font-family:var(--f);background:var(--blk);color:var(--wh);min-height:100vh
 .scrk-3{color:#CD7F32}
 
 /* PLAYER VIEWS */
-#vPW,#vPC,#vPQ,#vPA,#vPR{align-items:center;justify-content:center;text-align:center;padding:1.5rem;gap:1.2rem}
+#vPW,#vPC,#vPQ,#vPO,#vPA,#vPR{align-items:center;justify-content:center;text-align:center;padding:1.5rem;gap:1.2rem}
+.pw-hello{font-size:1.5rem;font-weight:900;color:var(--wh)}
+/* Options preview — mismo estilo que popts pero no tapeables */
+#po-opts .popt{cursor:default;opacity:.75}
+#po-opts .popt:hover{border-color:#444}
 .plogo{font-size:1.2rem;font-weight:900;color:var(--or)}
 .pname{font-size:.75rem;color:var(--gr)}
 .picon{font-size:2.8rem}
@@ -271,11 +275,12 @@ body{font-family:var(--f);background:var(--blk);color:var(--wh);min-height:100vh
 <!-- PLAYER: WAITING -->
 <div id="vPW" class="view">
   <div class="plogo">¿Somos Avatar o Somos Código?</div>
-  <div class="pname" id="pw-name"></div>
-  <div class="picon">⏳</div>
-  <div class="ptxt">Esperando al moderador...</div>
+  <div class="pw-hello">¡Hola, <span id="pw-name"></span>! 👋</div>
+  <div class="picon">✅</div>
+  <div class="ptxt" style="color:var(--ok);font-weight:700">Ya ingresaste correctamente.</div>
+  <div class="ptxt">En un momento comenzará tu participación.</div>
   <div class="ppts" id="pw-pts">0</div>
-  <div class="pptslbl">puntos</div>
+  <div class="pptslbl">puntos acumulados</div>
 </div>
 
 <!-- PLAYER: CHALLENGE IN PROGRESS -->
@@ -292,7 +297,15 @@ body{font-family:var(--f);background:var(--blk);color:var(--wh);min-height:100vh
   <div class="plogo">¿Somos Avatar o Somos Código?</div>
   <div class="pname" id="pq-name"></div>
   <div class="pq" id="pq-text"></div>
-  <div style="font-size:.8rem;color:var(--or);font-weight:700">⏳ Espera al cronómetro para responder</div>
+  <div style="font-size:.8rem;color:var(--or);font-weight:700">⏳ Espera a que aparezcan las opciones</div>
+</div>
+
+<!-- PLAYER: OPTIONS PREVIEW (visible pero no respondibles) -->
+<div id="vPO" class="view">
+  <div class="pname" id="po-name"></div>
+  <div class="pq" id="po-text"></div>
+  <div class="popts" id="po-opts"></div>
+  <div style="font-size:.82rem;color:var(--or);font-weight:700;margin-top:.4rem">⏳ Espera al cronómetro para responder</div>
 </div>
 
 <!-- PLAYER: ANSWERING -->
@@ -737,6 +750,8 @@ function showOpts() {
   document.getElementById('q-opts-label').textContent = 'Opciones visibles solo en MC';
   document.getElementById('btn-show-opts').style.display = 'none';
   document.getElementById('btn-timer').style.display = '';
+  // Mostrar opciones a jugadores (no respondibles aún)
+  fbBroadcast({type:'show_opts', catIdx:S.cat, qIdx:S.q});
 }
 function startTimer() {
   const ci = S.cat, qi = S.q;
@@ -871,6 +886,23 @@ function handlePlayerEvent(ev) {
       document.getElementById('pq-text').textContent = CATEGORIES[ev.catIdx].questions[ev.qIdx].q;
       showView('vPQ');
       break;
+    case 'show_opts': {
+      S.cat = ev.catIdx; S.q = ev.qIdx;
+      const qPrev = CATEGORIES[ev.catIdx].questions[ev.qIdx];
+      document.getElementById('po-name').textContent = S.name;
+      document.getElementById('po-text').textContent = qPrev.q;
+      const letters = ['A','B','C','D'];
+      const wrapPrev = document.getElementById('po-opts');
+      wrapPrev.innerHTML = '';
+      qPrev.opts.forEach((opt, i) => {
+        const div = document.createElement('div');
+        div.className = 'popt locked';
+        div.innerHTML = `<div class="pltr">${letters[i]}</div><span>${opt}</span>`;
+        wrapPrev.appendChild(div);
+      });
+      showView('vPO');
+      break;
+    }
     case 'timer_start':
       S.cat = ev.catIdx; S.q = ev.qIdx;
       S.timerMax = ev.timeLimit || 20000;
