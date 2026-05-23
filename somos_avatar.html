@@ -175,11 +175,14 @@ body{font-family:var(--f);background:var(--blk);color:var(--wh);min-height:100vh
   <div class="ll">¿Somos Avatar o Somos Código?</div>
   <div class="ls">Módulo XI · Universidad Anáhuac del Norte</div>
   <input id="inp-name" class="linp" placeholder="Tu nombre o equipo" maxlength="30">
-  <div class="lroles">
-    <button class="lrole" onclick="selRole('mc')">🎮 Moderador (MC)</button>
-    <button class="lrole" onclick="selRole('player')">📱 Jugador</button>
-    <button class="lrole" onclick="selRole('scores')">🏆 Marcador</button>
+  <div id="lroles-wrap">
+    <div class="lroles">
+      <button class="lrole" onclick="selRole('mc')">🎮 Moderador (MC)</button>
+      <button class="lrole" onclick="selRole('player')">📱 Jugador</button>
+      <button class="lrole" onclick="selRole('scores')">🏆 Marcador</button>
+    </div>
   </div>
+  <div id="lplayer-badge" style="display:none;font-size:.78rem;color:var(--gr);letter-spacing:1px;text-transform:uppercase">📱 Entrarás como Jugador</div>
   <button class="lbtn" onclick="doLogin()">Entrar →</button>
   <div id="lerr" class="lerr"></div>
 </div>
@@ -613,7 +616,7 @@ function showView(id) {
 const urlP = new URLSearchParams(location.search);
 window.addEventListener('load', () => {
   if (urlP.get('view') === 'scores') { S.role='scores'; S.name='Marcador'; showView('vSC'); refreshScoreDisplay(); return; }
-  if (urlP.get('module') !== null) { showView('vL'); preselectRole('player'); return; }
+  if (urlP.get('module') !== null) { lockAsPlayer(); showView('vL'); return; }
   showView('vL');
 });
 // iOS Safari restaura páginas desde caché sin recargar el JS.
@@ -621,10 +624,16 @@ window.addEventListener('load', () => {
 window.addEventListener('pageshow', ev => {
   if (ev.persisted && S.role === 'player') {
     doLogout();
-    if (urlP.get('module') !== null) preselectRole('player');
+    if (urlP.get('module') !== null) lockAsPlayer();
   }
 });
 
+function lockAsPlayer() {
+  // QR path: hide role buttons, lock role to player
+  S.role = 'player';
+  document.getElementById('lroles-wrap').style.display = 'none';
+  document.getElementById('lplayer-badge').style.display = '';
+}
 function preselectRole(r) {
   document.querySelectorAll('.lrole').forEach(b => b.classList.remove('sel'));
   const btn = document.querySelector(`.lrole[onclick="selRole('${r}')"]`);
