@@ -146,9 +146,17 @@ body{font-family:var(--f);background:var(--blk);color:var(--wh);min-height:100vh
   padding:.5rem 1.2rem;display:none;justify-content:space-between;align-items:center;z-index:50}
 #badge-name{font-size:.8rem;color:var(--gr);font-weight:600}
 #badge-pts{font-size:1.1rem;font-weight:900;color:var(--or)}
+#badge-logout{padding:.28rem .65rem;background:transparent;border:1px solid #444;color:var(--gr);
+  border-radius:5px;cursor:pointer;font-family:var(--f);font-size:.7rem;font-weight:600;margin-left:.5rem}
+#badge-logout:hover{border-color:var(--err);color:var(--err)}
 /* online/answered counters */
 .mc-live{font-size:.75rem;color:var(--or);font-weight:700;background:rgba(242,101,34,.15);
   padding:.3rem .7rem;border-radius:20px;border:1px solid var(--or)}
+/* players panel in MC board */
+#players-panel{display:none;flex-wrap:wrap;gap:.4rem;padding:.4rem .8rem;background:#0A0A0A;border-bottom:1px solid #1A1A1A;flex-shrink:0}
+.player-chip{display:flex;align-items:center;gap:.35rem;background:var(--card);border:1px solid #333;border-radius:20px;padding:.22rem .65rem;font-size:.72rem;font-weight:600;color:var(--wh)}
+.online-dot{width:7px;height:7px;border-radius:50%;background:var(--ok);flex-shrink:0;animation:pulse-dot 2s infinite}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
 </style>
 </head>
 <body>
@@ -177,6 +185,7 @@ body{font-family:var(--f);background:var(--blk);color:var(--wh);min-height:100vh
       <button class="tbtn d" onclick="resetGame()">🔄 Reiniciar</button>
     </div>
   </div>
+  <div id="players-panel"></div>
   <div class="bwrap">
     <div class="bgrid" id="board-grid"></div>
   </div>
@@ -305,7 +314,10 @@ body{font-family:var(--f);background:var(--blk);color:var(--wh);min-height:100vh
 
 <!-- SCORE BADGE -->
 <div id="score-badge">
-  <div id="badge-name"></div>
+  <div style="display:flex;align-items:center;gap:.3rem">
+    <div id="badge-name"></div>
+    <button id="badge-logout" onclick="doLogout()">✕ Salir</button>
+  </div>
   <div>
     <span style="font-size:.7rem;color:var(--gr);margin-right:.4rem">MIS PUNTOS</span>
     <span id="badge-pts">0</span>
@@ -512,12 +524,24 @@ try {
     if (S.role === 'player') refreshPlayerPts();
   });
 
-  // Presence listener (online count for MC)
+  // Presence listener (online count + player chips for MC)
   db.ref('presence').on('value', snap => {
     const data = snap.val() || {};
-    const count = Object.values(data).filter(v => v && v.role === 'player').length;
+    const players = Object.values(data).filter(v => v && v.role === 'player');
+    const count = players.length;
     const el = document.getElementById('online-count');
     if (el) el.textContent = '👥 ' + count + ' en línea';
+    const panel = document.getElementById('players-panel');
+    if (panel) {
+      if (players.length === 0) {
+        panel.style.display = 'none';
+      } else {
+        panel.style.display = 'flex';
+        panel.innerHTML = players.map(p =>
+          `<div class="player-chip"><div class="online-dot"></div>${p.name}</div>`
+        ).join('');
+      }
+    }
   });
 
 } catch(e) { console.warn('Firebase no configurado:', e.message); }
@@ -918,6 +942,32 @@ function renderPlayerReveal(correctIdx, expl, correctText) {
   document.getElementById('pr-total').textContent = newTotal;
   const badge = document.getElementById('badge-pts');
   if (badge) badge.textContent = newTotal;
+}
+
+// ═══════════════════════════════════════════════
+//  LOGOUT
+// ═══════════════════════════════════════════════
+function doLogout() {
+  // Remove presence from Firebase
+  if (db && S.name) {
+    const key = S.name.replace(/[.#$\/\[\]]/g,'_');
+    db.ref('presence/' + key).remove();
+  }
+  // Stop timers and listeners
+  clearInterval(S.timerIv);
+  stopAnswersListener();
+  // Reset state
+  S = { role:null, name:'', used:{}, cat:null, q:null,
+        timerIv:null, timerMs:0, timerMax:20000,
+        optsVisible:false, timerRunning:false, revealed:false,
+        pChoice:null, pLockedPts:null, scores:{} };
+  // Hide score badge
+  document.getElementById('score-badge').style.display = 'none';
+  // Reset landing form
+  document.getElementById('inp-name').value = '';
+  document.querySelectorAll('.lrole').forEach(b => b.classList.remove('sel'));
+  document.getElementById('lerr').textContent = '';
+  showView('vL');
 }
 
 // ═══════════════════════════════════════════════
